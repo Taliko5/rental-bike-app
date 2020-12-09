@@ -19,7 +19,7 @@ Vue.component("cluster", GmapCluster);
 
 Vue.use(VueGoogleMaps, {
   load: {
-    key: "AIzaSyDlMQGzgDMRY7lQbJM3QFjueKJNWklkoBA",
+    key: "A",
     libraries: "places" // This is required if you use the Autocomplete plugin
     // OR: libraries: 'places,drawing'
     // OR: libraries: 'places,drawing,visualization'

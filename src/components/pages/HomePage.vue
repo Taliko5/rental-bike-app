@@ -15,7 +15,7 @@
         :label="password.label"
         v-model="password.value"
       />
-      <SubmitButtons>Sign in</SubmitButtons>
+      <SubmitButtons >Sign in</SubmitButtons>
     </b-form>
     link to
     <router-link to="/signup"> Sign up</router-link>
