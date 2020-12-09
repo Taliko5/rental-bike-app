@@ -3,7 +3,7 @@
     <b-button block
 			type="submit"
 			name="submit"
-			:variant="color"
+			:variant="colo
 			@click="$emit('push-submit-button')"
 			><slot></slot>
 		</b-button>
