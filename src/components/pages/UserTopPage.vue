@@ -1,11 +1,18 @@
 <template>
-  <div>
-    userHome google map hehe
+  <div class="user-top-page">
+    <div class="logout-wrapper">log out</div>
     <GmapMap
       :center="{ lat: 52.516389, lng: 13.3775 }"
       :zoom="15"
-      map-type-id="terrain"
+      map-type-id="roadmap"
       style="width: 50%; height: 60vh"
+      :options="{
+        mapTypeControl: false,
+        streetViewControl: false,
+        rotateControl: false,
+        fullscreenControl: false,
+        disableDefaultUi: false
+      }"
     >
       <!-- <GmapMarker
         :key="index"
