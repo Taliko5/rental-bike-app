@@ -4,6 +4,9 @@ import * as VueGoogleMaps from "vue2-google-maps";
 import MarkerClusterer from "js-marker-clusterer";
 import App from "./App.vue";
 import router from "./router";
+import GmapCluster from "gmap-vue/dist/components/cluster";
+
+
 
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-vue/dist/bootstrap-vue.css";
@@ -12,10 +15,11 @@ Vue.use(BootstrapVue);
 Vue.use(BootstrapVueIcons);
 Vue.config.productionTip = false;
 Vue.use(MarkerClusterer);
+Vue.component("cluster", GmapCluster);
 
 Vue.use(VueGoogleMaps, {
   load: {
-    key: ,
+    key: "AIzaSyDlMQGzgDMRY7lQbJM3QFjueKJNWklkoBA",
     libraries: "places" // This is required if you use the Autocomplete plugin
     // OR: libraries: 'places,drawing'
     // OR: libraries: 'places,drawing,visualization'
