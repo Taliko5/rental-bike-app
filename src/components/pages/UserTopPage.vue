@@ -2,17 +2,11 @@
   <div class="user-top-page">
     <div class="logout-wrapper">log out</div>
     <GmapMap
-      :center="{ lat: 52.516389, lng: 13.3775 }"
+      :center="center"
       :zoom="15"
       map-type-id="roadmap"
       style="width: 50%; height: 60vh"
-      :options="{
-        mapTypeControl: false,
-        streetViewControl: false,
-        rotateControl: false,
-        fullscreenControl: false,
-        disableDefaultUi: false
-      }"
+      :options="gmapMapOptions"
     >
       <!-- <GmapMarker
         :key="index"
@@ -26,35 +20,31 @@
         <gmap-custom-marker :key="index" v-for="(m, index) in markers" :marker="m.location">
           <!-- if the bike is rented by another user change maker color -->
           <img
+            v-if="!m.renting"
             class="img"
             src="@/assets/img/icons/marker_red.svg"
-            v-if="!m.renting"
-            @click="openInfoWindow(m)"
+            @click="toggleInfoWindow(m, index)"
           />
           <img
+            v-if="m.renting"
             class="img"
             src="@/assets/img/icons/marker_black.svg"
-            v-if="m.renting"
-            @click="openInfoWindow(m)"
+            @click="toggleInfoWindow(m, index)"
           />
         </gmap-custom-marker>
       </cluster>
       <GmapInfoWindow
-        @closeclick="updateiwOpen(m)"
-        :key="m.id"
-        v-for="m in markers"
-        :position="m.location"
-        :opened="m.InfoWindowIsOpen"
-        :options="{
-          pixelOffset: {
-            width: 0,
-            height: -35
-          }
-        }"
+        :position="infoWinPos"
+        :opened="infoWinIsOpen"
+        @closeclick="infoWinIsOpen = false"
+        :options="infoWinOptions"
       >
-        <div class="info-window-style" v-if="!m.renting">
-          <div>{{ m.content }}</div>
+        <div class="info-window-style" v-if="!bikeIsRenting">
+          <div v-html="bikeName"></div>
           <SaveButtons>RENT BIKE?</SaveButtons>
+        </div>
+        <div class="info-window-style" v-if="bikeIsRenting">
+          another user renting bike
         </div>
       </GmapInfoWindow>
     </GmapMap>
@@ -73,43 +63,66 @@ export default {
   data() {
     return {
       //demo marker list
+      center: { lat: 52.516389, lng: 13.3775 },
+      gmapMapOptions: {
+        mapTypeControl: false,
+        streetViewControl: false,
+        rotateControl: false,
+        fullscreenControl: false,
+        disableDefaultUi: false
+      },
+      infoWinIsOpen: false,
+      infoWinPos: {
+        lat: 0,
+        lng: 0
+      },
+      bikeName: "",
+      bikeIsRenting: false,
+      userIsRentingBike: false,
+      currentMarkerIdx: null,
+      infoWinOptions: {
+        pixelOffset: {
+          width: 0,
+          height: -35
+        }
+      },
       markers: [
         {
           id: "01",
+          bikeName: "mike",
           location: { lat: 52.516389, lng: 13.3775 },
           content: "bundesland hehe",
-          renting: false,
-          InfoWindowIsOpen: false
+          renting: false
         },
         {
           id: "02",
+          bikeName: "Neko",
           location: { lat: 52.516589, lng: 13.3275 },
           content: "TU hehe",
-          renting: false,
-          InfoWindowIsOpen: false
+          renting: false
         },
         {
           id: "03",
+          bikeName: "Inu",
           location: { lat: 52.516489, lng: 13.3575 },
           content: "TU hehe",
-          renting: true,
-          InfoWindowIsOpen: false
+          renting: true
         }
       ]
     };
   },
   methods: {
     // looking for identified id and not renting and change InfoWindowIsOpen to open infowindow
-    openInfoWindow(clickedaMrker) {
-      return this.markers.map(m => {
-        m.id === clickedaMrker.id && clickedaMrker.renting === false
-          ? (m.InfoWindowIsOpen = true)
-          : (m.InfoWindowIsOpen = false);
-      });
-    },
-    // when infWindow closes InfoWindowIsOpen changes false
-    updateiwOpen(m) {
-      m.InfoWindowIsOpen = false;
+    toggleInfoWindow(clickedMarker, index) {
+      this.infoWinPos = clickedMarker.location;
+      if (this.currentMarkerIdx === index) {
+        this.bikeIsRenting = clickedMarker.renting;
+        this.bikeName = clickedMarker.bikeName;
+        this.infoWinIsOpen = !this.infoWinIsOpen;
+      } else {
+        this.infoWinIsOpen = true;
+        this.currentMarkerIdx = index;
+      }
     }
   }
 };
