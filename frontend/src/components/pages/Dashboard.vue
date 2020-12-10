@@ -55,7 +55,7 @@
 import SaveButtons from "../atoms/SaveButtons.vue";
 import GmapCustomMarker from "vue2-gmap-custom-marker";
 export default {
-  name: "UserTopPage",
+  name: "Dashboard",
   components: {
     SaveButtons,
     "gmap-custom-marker": GmapCustomMarker

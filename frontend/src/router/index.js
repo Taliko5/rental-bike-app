@@ -1,21 +1,15 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
 import ErrorPage from "../components/pages/ErrorPage.vue";
-import Home from "../views/Home.vue";
 import HomePage from "../components/pages/HomePage.vue";
 import SignUpPage from "../components/pages/SignUpPage.vue";
-import UserTopPage from "../components/pages/UserTopPage";
+import Dashboard from "../components/pages/Dashboard";
 
 Vue.use(VueRouter);
 
 const routes = [
   {
     path: "/",
-    name: "Home",
-    component: Home
-  },
-  {
-    path: "/home",
     name: "HomePage",
     component: HomePage
   },
@@ -33,9 +27,9 @@ const routes = [
     component: () => import(/* webpackChunkName: "about" */ "../views/About.vue")
   },
   {
-    path: "/user",
-    name: "UserTopPage",
-    component: UserTopPage
+    path: "/dashboard",
+    name: "Dashboard",
+    component: Dashboard
   },
   {
     path: "*",
