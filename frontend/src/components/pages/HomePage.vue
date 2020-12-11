@@ -1,7 +1,8 @@
 <template>
   <div>
     sign-in
-    <b-form id="sign-in">
+    <div class="error-message">{{ error }}</div>
+    <b-form id="sign-in" @submit.prevent="signIn">
       <TextInput
         :idName="email.id"
         :inputType="email.inputType"
@@ -15,7 +16,7 @@
         :label="password.label"
         v-model="password.value"
       />
-      <SubmitButtons >Sign in</SubmitButtons>
+      <SubmitButtons>Sign in</SubmitButtons>
     </b-form>
     link to
     <router-link to="/signup"> Sign up</router-link>
@@ -23,6 +24,7 @@
 </template>
 
 <script>
+import * as firebase from "firebase/app";
 import SubmitButtons from "../atoms/Submitbuttons";
 import TextInput from "../atoms/TextInput";
 
@@ -34,6 +36,7 @@ export default {
   },
   data() {
     return {
+      error: "",
       email: {
         id: "sign-in_email",
         value: "",
@@ -47,6 +50,19 @@ export default {
         label: "password"
       }
     };
+  },
+  methods: {
+    async signIn() {
+      try {
+        const newUser = firebase.auth().signin(this.email.value, this.password.value);
+        console.log(user);
+        this.$router.replace({ name: "dashboard" });
+        concole.log();
+        alert("submitted");
+      } catch (err) {
+        console.log(err);
+      }
+    }
   }
 };
 </script>

@@ -1,8 +1,8 @@
 <template>
   <div>
     Sign up
-    <div class="error-message">{{ error.message }}</div>
-    <b-form id="sign-up" @submit.prevent="signup">
+    <div class="error-message">{{ error }}</div>
+    <b-form id="sign-up" @submit.prevent="signUp">
       <TextInput
         :idName="email.id"
         :inputType="email.inputType"
@@ -23,13 +23,13 @@
 </template>
 
 <script>
-import * as firebase from "firebase/app";
+import firebase from "firebase";
 import moduleName from "firebase/auth";
 import SubmitButtons from "../atoms/Submitbuttons";
 import TextInput from "../atoms/TextInput";
 
 export default {
-  name: "SignUpPage",
+  name: "UPage",
   components: {
     SubmitButtons,
     TextInput
@@ -52,18 +52,18 @@ export default {
     };
   },
   methods: {
-    async signup() {
+    async signUp() {
       try {
-        const newUser = firebase.authsignupWithEmailAndPassword(
+        const newUser = await firebase.auth().createUserWithEmailAndPassword(
           this.email.value,
-          this.passwor.value
+          this.password.value
         );
-        console.log(user);
-        this.$router.replace({ name: "dashboard" });
+        console.log(newUser);
+        this.$router.replace({ name: "Dashboard" });
         concole.log();
-        alert("submitted");
       } catch (err) {
         console.log(err);
+        this.error = err.message;
       }
     }
   }
