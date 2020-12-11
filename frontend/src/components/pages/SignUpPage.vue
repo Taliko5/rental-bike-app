@@ -1,8 +1,8 @@
 <template>
   <div>
     Sign up
-    <div class="error-message" v-if="error">{{ error.message }}</div>
-    <b-form id="sign-up" @submit.prevent="createUser">
+    <div class="error-message">{{ error.message }}</div>
+    <b-form id="sign-up" @submit.prevent="signup">
       <TextInput
         :idName="email.id"
         :inputType="email.inputType"
@@ -52,11 +52,12 @@ export default {
     };
   },
   methods: {
-    async createUser() {
+    async signup() {
       try {
-        const newUser = firebase
-          .auth()
-          .createUserWithEmailAndPassword(this.email.value, this.passwor.value);
+        const newUser = firebase.authsignupWithEmailAndPassword(
+          this.email.value,
+          this.passwor.value
+        );
         console.log(user);
         this.$router.replace({ name: "dashboard" });
         concole.log();
