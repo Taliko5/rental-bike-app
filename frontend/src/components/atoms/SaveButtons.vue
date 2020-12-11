@@ -1,6 +1,6 @@
 <template>
   <div class="save-button">
-    <b-button :variant="color" pill :callback="callback">
+    <b-button :variant="color" pill>
       <slot></slot>
     </b-button>
   </div>
@@ -16,17 +16,17 @@ export default {
       default: "primary"
     }
   },
-  methods: {
-    onClick(e) {
-      if (typeof this.callback === "function") {
-        const result = this.callback(e);
-        if (result !== undefined) {
-          return result;
-        }
-        return true;
-      }
-      return false;
-    }
-  }
+  // methods: {
+  //   onClick(e) {
+  //     if (typeof this.callback === "function") {
+  //       const result = this.callback(e);
+  //       if (result !== undefined) {
+  //         return result;
+  //       }
+  //       return true;
+  //     }
+  //     return false;
+  //   }
+  // }
 };
 </script>

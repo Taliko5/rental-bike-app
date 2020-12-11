@@ -53,6 +53,7 @@
 <script>
 import SaveButtons from "../atoms/SaveButtons.vue";
 import GmapCustomMarker from "vue2-gmap-custom-marker";
+import db from "../firebaseInit";
 export default {
   name: "GoogleMap",
   components: {
@@ -85,35 +86,29 @@ export default {
           height: -35
         }
       },
-      markers: [
-        {
-          id: "01",
-          bikeName: "mike",
-          location: { lat: 52.516389, lng: 13.3775 },
-          content: "bundesland hehe",
-          renting: false
-        },
-        {
-          id: "02",
-          bikeName: "Neko",
-          location: { lat: 52.516589, lng: 13.3275 },
-          content: "TU hehe",
-          renting: false
-        },
-        {
-          id: "03",
-          bikeName: "Inu",
-          location: { lat: 52.516489, lng: 13.3575 },
-          content: "TU hehe",
-          renting: true
-        }
-      ]
+      markers: []
     };
+  },
+  created() {
+    //getting bicicle data from firebase
+    db.collection("bicycle")
+      .get()
+      .then(querySnapshot => {
+        querySnapshot.forEach(doc => {
+          const data = {
+            id: doc.id,
+            bikeName: doc.data().name,
+            location: { lat: doc.data().lat, lng: doc.data().lng },
+            renting: doc.data().rented
+          };
+          this.markers.push(data);
+        });
+      });
   },
   methods: {
     // looking for identified id and not renting and change InfoWindowIsOpen to open infowindow
     toggleInfoWindow(clickedMarker, index) {
-     this.infoWinPos = clickedMarker.location;
+      this.infoWinPos = clickedMarker.location;
       if (this.currentMarkerIdx === index) {
         this.bikeIsRenting = clickedMarker.renting;
         this.bikeName = clickedMarker.bikeName;
@@ -131,3 +126,8 @@ export default {
   width: 40px;
 }
 </style>
+// { // id: "01", // bikeName: "mike", // location: { lat: 52.516389, lng: 13.3775 }, // content:
+"bundesland hehe", // renting: false // }, // { // id: "02", // bikeName: "Neko", // location: {
+lat: 52.516589, lng: 13.3275 }, // content: "TU hehe", // renting: false // }, // { // id: "03", //
+bikeName: "Inu", // location: { lat: 52.516489, lng: 13.3575 }, // content: "TU hehe", // renting:
+true // }
