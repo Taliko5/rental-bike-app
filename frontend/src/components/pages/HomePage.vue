@@ -24,7 +24,7 @@
 </template>
 
 <script>
-import * as firebase from "firebase/app";
+import firebase from "firebase";
 import SubmitButtons from "../atoms/Submitbuttons";
 import TextInput from "../atoms/TextInput";
 
@@ -54,13 +54,15 @@ export default {
   methods: {
     async signIn() {
       try {
-        const newUser = firebase.auth().signin(this.email.value, this.password.value);
+        const user = await firebase
+          .auth()
+          .signInWithEmailAndPassword(this.email.value, this.password.value);
         console.log(user);
-        this.$router.replace({ name: "dashboard" });
-        concole.log();
-        alert("submitted");
+        alert(`you are logged in`);
+        this.$router.replace({ name: "Dashboard" });
       } catch (err) {
         console.log(err);
+        this.error = err.message;
       }
     }
   }

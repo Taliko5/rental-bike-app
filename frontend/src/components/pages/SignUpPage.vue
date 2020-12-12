@@ -59,8 +59,8 @@ export default {
           this.password.value
         );
         console.log(newUser);
+        alert(`you are Sign Up`);
         this.$router.replace({ name: "Dashboard" });
-        concole.log();
       } catch (err) {
         console.log(err);
         this.error = err.message;

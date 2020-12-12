@@ -6,7 +6,9 @@ import MarkerClusterer from "js-marker-clusterer";
 import GmapCluster from "gmap-vue/dist/components/cluster";
 import App from "./App.vue";
 import router from "./router";
-import axios from 'axios';
+import firebase from "firebase";
+import './components/firebaseInit'
+import axios from "axios";
 
 //bootstrap css
 import "bootstrap/dist/css/bootstrap.css";
@@ -26,7 +28,14 @@ Vue.use(VueGoogleMaps, {
   }
 });
 
-new Vue({
-  router,
-  render: h => h(App)
-}).$mount("#app");
+// check user before loading if the User's authentication's state has changed
+let app;
+firebase.auth().onAuthStateChanged(user => {
+  console.log(user);
+  if (!app) {
+    app = new Vue({
+      router,
+      render: h => h(App)
+    }).$mount("#app");
+  }
+});
