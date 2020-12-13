@@ -7,6 +7,9 @@
 
 <script>
 import firebase from "firebase";
+import 'firebase/database';
+import 'firebase/storage';
+
 import GoogleMap from "../templats/GoogleMap";
 export default {
   name: "Dashboard",
@@ -20,7 +23,7 @@ export default {
     };
   },
   methods: {
-   async logOut() {
+    async logOut() {
       try {
         const user = await firebase.auth().signOut();
         console.log("logout", user);

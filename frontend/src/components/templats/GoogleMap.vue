@@ -25,9 +25,15 @@
             @click="toggleInfoWindow(m, index)"
           />
           <img
-            v-if="m.renting"
+            v-if="m.renting && m.renitng_user_email !== userInfo.email"
             class="img"
             src="@/assets/img/icons/marker_black.svg"
+            @click="toggleInfoWindow(m, index)"
+          />
+          <img
+            v-if="m.renting && m.renitng_user_email === userInfo.email"
+            class="img"
+            src="@/assets/img/icons/marker_white.svg"
             @click="toggleInfoWindow(m, index)"
           />
         </gmap-custom-marker>
@@ -39,8 +45,8 @@
         :options="infoWinOptions"
       >
         <div class="info-window-style" v-if="!bikeIsRenting">
-          <div v-html="bikeName"></div>
-          <SaveButtons>RENT BIKE?</SaveButtons>
+          <div v-html="chosenBikeName"></div>
+          <SaveButtons @click="rentingBike">RENT BIKE?</SaveButtons>
         </div>
         <div class="info-window-style" v-if="bikeIsRenting">
           another user renting bike
@@ -51,9 +57,12 @@
 </template>
 
 <script>
+import firebase from "firebase";
+import db from "../firebaseInit";
+import "firebase/database";
+import "firebase/storage";
 import SaveButtons from "../atoms/SaveButtons.vue";
 import GmapCustomMarker from "vue2-gmap-custom-marker";
-import db from "../firebaseInit";
 export default {
   name: "GoogleMap",
   components: {
@@ -62,7 +71,9 @@ export default {
   },
   data() {
     return {
-      //demo marker list
+      userInfo: {},
+      markers: [],
+      //TODO demo marker list. next the center will be user's location point
       center: { lat: 52.516389, lng: 13.3775 },
       gmapMapOptions: {
         mapTypeControl: false,
@@ -76,7 +87,8 @@ export default {
         lat: 0,
         lng: 0
       },
-      bikeName: "",
+      chosenBikeId: "",
+      chosenBikeName: "",
       bikeIsRenting: false,
       userIsRentingBike: false,
       currentMarkerIdx: null,
@@ -85,12 +97,16 @@ export default {
           width: 0,
           height: -35
         }
-      },
-      markers: []
+      }
     };
   },
+  // beforeRouteEnter (to, from, next) {
+  //   db.collection('renting_list').where('user_email', '==', this.userInfo.Email).get().then(querySnapshot => {
+
+  //   })
+  // },
   created() {
-    //getting bicicle data from firebase
+    //getting bicycle data from firebase
     db.collection("bicycle")
       .get()
       .then(querySnapshot => {
@@ -99,24 +115,100 @@ export default {
             id: doc.id,
             bikeName: doc.data().name,
             location: { lat: doc.data().lat, lng: doc.data().lng },
-            renting: doc.data().rented
+            renting: doc.data().rented,
+            renitng_user_email: doc.data().renitng_user_email
           };
           this.markers.push(data);
         });
       });
+
+    const user = firebase.auth().currentUser;
+    if (user) {
+      console.log(user.email);
+      const data = {
+        email: user.email
+      };
+      this.userInfo = data;
+    } else {
+      console.log("no user info");
+    }
   },
   methods: {
     // looking for identified id and not renting and change InfoWindowIsOpen to open infowindow
     toggleInfoWindow(clickedMarker, index) {
       this.infoWinPos = clickedMarker.location;
       if (this.currentMarkerIdx === index) {
+        this.chosenBikeId = clickedMarker.id;
         this.bikeIsRenting = clickedMarker.renting;
-        this.bikeName = clickedMarker.bikeName;
+        this.chosenBikeName = clickedMarker.bikeName;
         this.infoWinIsOpen = !this.infoWinIsOpen;
       } else {
         this.infoWinIsOpen = true;
         this.currentMarkerIdx = index;
       }
+    },
+    //update the bike's rent infos rented:true retuned:false (defaut, renred:flase, returned:true)
+    async updateRentedBikeInfo() {
+      try {
+        const data = db.collection("bicycle").doc(this.chosenBikeId);
+        await data
+          .update({
+            rented: true,
+            retuned: false,
+            renitng_user_email: this.userInfo.email
+          })
+          .then(bike => {
+            console.log("update bike's Info:", bike);
+          });
+      } catch (error) {
+        console.log("error by ubdationg bike info:", error);
+      }
+    },
+    async addRentingBikeList() {
+      try {
+        //getting current user
+        const user = await firebase.auth().currentUser;
+        // const bike = await firestore().collection("users").doc(`id/${this.bike.id}`);
+        //chosen bike's path
+        const bike = db.doc(`id/${this.chosenBikeId}`);
+        // adding data
+        const data = {
+          user_email: user.email,
+          bicycle_id: bike,
+          bike_name: this.chosenBikeName,
+          lat: this.infoWinPos.lat,
+          lng: this.infoWinPos.lng,
+          start_time: firebase.firestore.FieldValue.serverTimestamp()
+        };
+        // add a new data to the 'renting_list' in DB
+        const list = await db.collection("renting_list").add(data);
+        console.log(list, " add a rent list succsess!");
+      } catch (error) {
+        console.error("Error by adding renting_bike list: ", error);
+      }
+    },
+    changemarkerInfo() {
+      db.collection("bicycle")
+        .get()
+        .then(querySnapshot => {
+          querySnapshot.forEach(doc => {
+            const data = {
+              id: doc.id,
+              bikeName: doc.data().name,
+              location: { lat: doc.data().lat, lng: doc.data().lng },
+              renting: doc.data().rented,
+              renitng_user_email: doc.data().renitng_user_email
+            };
+            this.markerss.splice(0).push(data);
+          });
+        });
+    },
+
+    rentingBike() {
+      this.addRentingBikeList();
+      this.updateRentedBikeInfo();
+      this.changemarkerInfo();
+      this.$router.replace("/dashboard/renting");
     }
   }
 };
@@ -126,8 +218,8 @@ export default {
   width: 40px;
 }
 </style>
-// { // id: "01", // bikeName: "mike", // location: { lat: 52.516389, lng: 13.3775 }, // content:
-"bundesland hehe", // renting: false // }, // { // id: "02", // bikeName: "Neko", // location: {
-lat: 52.516589, lng: 13.3275 }, // content: "TU hehe", // renting: false // }, // { // id: "03", //
-bikeName: "Inu", // location: { lat: 52.516489, lng: 13.3575 }, // content: "TU hehe", // renting:
-true // }
+// { // id: "01", // chosenBikeName: "mike", // location: { lat: 52.516389, lng: 13.3775 }, //
+content: "bundesland hehe", // renting: false // }, // { // id: "02", // chosenBikeName: "Neko", //
+location: { lat: 52.516589, lng: 13.3275 }, // content: "TU hehe", // renting: false // }, // { //
+id: "03", // chosenBikeName: "Inu", // location: { lat: 52.516489, lng: 13.3575 }, // content: "TU
+hehe", // renting: true // }

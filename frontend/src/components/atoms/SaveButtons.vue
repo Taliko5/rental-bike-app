@@ -1,5 +1,5 @@
 <template>
-  <div class="save-button">
+  <div class="save-button" @click="handleClick">
     <b-button :variant="color" pill>
       <slot></slot>
     </b-button>
@@ -16,17 +16,10 @@ export default {
       default: "primary"
     }
   },
-  // methods: {
-  //   onClick(e) {
-  //     if (typeof this.callback === "function") {
-  //       const result = this.callback(e);
-  //       if (result !== undefined) {
-  //         return result;
-  //       }
-  //       return true;
-  //     }
-  //     return false;
-  //   }
-  // }
+  methods: {
+    handleClick() {
+      this.$emit("click");
+    }
+  }
 };
 </script>

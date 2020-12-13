@@ -52,12 +52,30 @@ export default {
     };
   },
   methods: {
+    async addExtraInfoToNewUser() {
+      try {
+        let name, email;
+        //get current user's info
+        const user = await firebase.auth().currentUser;
+        if (user != null) {
+          email = user.email;
+        }
+        //and update with new infos
+        user.updateProfile({
+          email: user.email,
+          renting_bike: false,
+          returned: true
+        });
+        console.log("add info success", user);
+      } catch (err) {
+        console.log(err);
+      }
+    },
     async signUp() {
       try {
-        const newUser = await firebase.auth().createUserWithEmailAndPassword(
-          this.email.value,
-          this.password.value
-        );
+        const newUser = await firebase
+          .auth()
+          .createUserWithEmailAndPassword(this.email.value, this.password.value);
         console.log(newUser);
         alert(`you are Sign Up`);
         this.$router.replace({ name: "Dashboard" });

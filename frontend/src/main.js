@@ -1,5 +1,6 @@
 import Vue from "vue";
 import { BootstrapVue, BootstrapVueIcons } from "bootstrap-vue";
+import 'default-passive-events';
 //google map
 import * as VueGoogleMaps from "vue2-google-maps";
 import MarkerClusterer from "js-marker-clusterer";

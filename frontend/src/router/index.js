@@ -37,6 +37,7 @@ const routes = [
     path: "/dashboard",
     name: "Dashboard",
     component: Dashboard,
+    alias: "/dashboard/renting",
     meta: {
       requiresAuth: true
     }
@@ -73,19 +74,18 @@ router.beforeEach((to, from, next) => {
   let currentUser = firebase.auth().currentUser;
   //check for requiredAuth guard
   if (requiresAuth) {
-//check if NOT LOGGED IN, redirect to the homepage
+    //check if NOT LOGGED IN, redirect to the homepage
     if (!currentUser) {
       next({
         path: "/",
         query: { redirect: to.fullPath }
       });
-    }else {
+    } else {
       next();
     }
   } else {
     next(); // next() を常に呼び出すようにしてください!
   }
 });
-
 
 export default router;
