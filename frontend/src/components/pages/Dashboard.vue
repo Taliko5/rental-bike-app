@@ -17,7 +17,7 @@ export default {
   name: "Dashboard",
   components: {
     GoogleMap,
-    SideMenu
+    SideMenu,
   },
   data() {
     return {
@@ -27,4 +27,3 @@ export default {
   }
 };
 </script>
-<style lang="scss" scoped></style>

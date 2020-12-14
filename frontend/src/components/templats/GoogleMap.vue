@@ -1,5 +1,6 @@
 <template>
   <div class="google-map-wrapper">
+    <div class="logout"><span class="logout-wrapper" @click="logOut">log out</span></div>
     <GmapMap
       :center="center"
       :zoom="15"
@@ -7,14 +8,6 @@
       style="width: 50%; height: 60vh"
       :options="gmapMapOptions"
     >
-      <!-- <GmapMarker
-        :key="index"
-        v-for="(m, index) in markers"
-        :position="m.location"
-        :clickable="true"
-        :draggable="true"
-        @click="center = m.position"
-      /> -->
       <cluster>
         <gmap-custom-marker :key="index" v-for="(m, index) in markers" :marker="m.location">
           <!-- if the bike is rented by another user change maker color -->
@@ -78,6 +71,17 @@
         </div>
       </GmapInfoWindow>
     </GmapMap>
+    {{ $route.path }} : whichpath are we
+    <div class="renting-bike-mini-window" v-if="$route.path === '/dashboard/rent'">
+      <b-icon class="close-icon" icon="x" @click="returnToDashboard"></b-icon>
+      you are now renting the bike
+      <div v-html="userInfo.bikeName"></div>
+      <SaveButtons @click="returnBike">RETURN BIKE</SaveButtons>
+    </div>
+    <div class="rerutning-bike-mini-window" v-if="$route.path === '/dashboard/returned'">
+      <b-icon class="close-icon" icon="x" @click="returnToDashboard"></b-icon>
+      you have returned the bike!
+    </div>
   </div>
 </template>
 
@@ -86,13 +90,17 @@ import firebase from "firebase";
 import db from "../firebaseInit";
 import "firebase/database";
 import "firebase/storage";
-import SaveButtons from "../atoms/SaveButtons.vue";
 import GmapCustomMarker from "vue2-gmap-custom-marker";
+import SaveButtons from "../atoms/SaveButtons.vue";
+import RentInfoPopUp from "../atoms/RentInfoPopUp";
+import ReturnedPopUp from "../atoms/ReturnedPopUp";
 export default {
   name: "GoogleMap",
   components: {
     SaveButtons,
-    "gmap-custom-marker": GmapCustomMarker
+    GmapCustomMarker,
+    RentInfoPopUp,
+    ReturnedPopUp
   },
   data() {
     return {
@@ -132,7 +140,6 @@ export default {
       .get()
       .then(querySnapshot => {
         querySnapshot.forEach(doc => {
-          console.log(doc.data().renitng_user_email);
           const data = {
             id: doc.id,
             bikeName: doc.data().name,
@@ -152,7 +159,6 @@ export default {
       .get()
       .then(querySnapshot => {
         querySnapshot.forEach(doc => {
-          console.log(doc.id, " => ", doc.data());
           if (doc.data()) {
             const data = {
               email: doc.data().user_email,
@@ -166,7 +172,7 @@ export default {
             this.userInfo = data;
             //if user email is not in the renting_list
             // making user info wwith rentingbike:false, user email
-          } else if (!rentingData) {
+          } else if (!doc) {
             const data = {
               email: user.email,
               rentingBike: false
@@ -178,13 +184,27 @@ export default {
         });
       })
       .catch(function(error) {
-        console.log("Error getting documents: ", error);
+        console.log("Error getting renting_list: ", error);
       });
 
     //if user email is on the renting_list
     //  making user info wwith rentingbike:true,bike ID, email
   },
+
   methods: {
+    async logOut() {
+      try {
+        const user = await firebase.auth().signOut();
+        alert(`you are logged out`);
+        this.$router.replace({ name: "HomePage" });
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    // there is no reload in Vue-router
+    reload() {
+      this.$router.go({ path: this.$router.currentRoute.path, force: true });
+    },
     // looking for identified id and not renting and change InfoWindowIsOpen to open infowindow
     toggleInfoWindow(clickedMarker, index) {
       this.infoWinPos = clickedMarker.location;
@@ -199,6 +219,7 @@ export default {
         this.infoWinIsOpen = true;
       }
     },
+
     //update the bike's rent infos rented:true retuned:false (defaut, renred:flase, returned:true)
     async updateRentedBikeInfo() {
       try {
@@ -210,14 +231,16 @@ export default {
             renitng_user_email: user.email,
             rented: true
           })
-          .then(bike => {
-            console.log("update bike's Info:", bike);
-            this.$router.go({ path: "/dashboard/renting", force: true });
+          .then(() => {
+            alert(`you have rented the bicycle`);
+            this.$router.replace({ path: "/dashboard/rent" });
+            this.reload();
           });
       } catch (error) {
         console.log("error by ubdationg bike info:", error);
       }
     },
+
     async updateReturnedBikeInfo() {
       try {
         const data = db.collection("bicycle").doc(this.userInfo.bikeId);
@@ -226,15 +249,17 @@ export default {
             rented: false,
             renitng_user_email: ""
           })
-          .then(bike => {
-            console.log("update bike's Info:", bike);
+          .then(() => {
             this.initializeUserInfo();
-            // this.$router.go({ path: "/dashboard/returned", force: true });
+            alert(`you have returned the bicycle`);
+            this.$router.replace({ path: "/dashboard/returned" });
+            this.reload();
           });
       } catch (error) {
         console.log("error by ubdationg bike info:", error);
       }
     },
+
     initializeUserInfo() {
       const user = firebase.auth().currentUser;
       const data = {
@@ -246,6 +271,7 @@ export default {
       };
       this.userInfo = data;
     },
+
     async addRentingBikeList() {
       try {
         //getting current user
@@ -263,12 +289,11 @@ export default {
         };
         // add a new data to the 'renting_list' in DB
         const list = await db.collection("renting_list").add(data);
-        console.log(list, " add a rent list succsess!");
       } catch (error) {
         console.error("Error by adding renting_bike list: ", error);
       }
     },
-    //
+
     async deleteRentingBikeList() {
       const user = await firebase.auth().currentUser;
       const RentingList = await db
@@ -278,14 +303,14 @@ export default {
         .then(querySnapshot => {
           querySnapshot.forEach(doc => {
             doc.ref.delete();
-            console.log("successs delete!");
           });
         })
         .catch(function(error) {
           console.log("Error delete bilinlist: ", error);
         });
     },
-    //TODO fix history function
+
+    //TODO fix history function by returning bicycle
     async addHistory() {
       try {
         //getting current user, bike, and rentinglist
@@ -326,10 +351,8 @@ export default {
       this.updateRentedBikeInfo();
     },
     returnBike() {
-      // this.addHistory();
       this.deleteRentingBikeList();
       this.updateReturnedBikeInfo();
-      console.log("returned!");
     }
   }
 };

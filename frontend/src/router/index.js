@@ -1,10 +1,12 @@
 import Vue from "vue";
 import firebase from "firebase";
+import db from "../components/firebaseInit";
+import "firebase/database";
+import "firebase/storage";
 import VueRouter from "vue-router";
 import ErrorPage from "../components/pages/ErrorPage.vue";
 import HomePage from "../components/pages/HomePage.vue";
 import SignUpPage from "../components/pages/SignUpPage.vue";
-import Dashboard from "../components/pages/Dashboard";
 
 Vue.use(VueRouter);
 
@@ -26,22 +28,30 @@ const routes = [
     }
   },
   {
-    path: "/about",
-    name: "About",
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ "../views/About.vue")
-  },
-  {
     path: "/dashboard",
     name: "Dashboard",
-    component: Dashboard,
-    alias: "/dashboard/renting",
-    alias: "/dashboard/returned",
+    component: () => import("../components/pages/Dashboard.vue"),
     meta: {
       requiresAuth: true
     }
+  },
+  {
+    path: "/dashboard/:id",
+    name: "Dashboard",
+    component: () => import("../components/pages/Dashboard.vue"),
+    meta: {
+      requiresAuth: true
+    },
+    children: [
+      {
+        path: "rent",
+        name: "Rent",
+      },
+      {
+        path: "returned",
+        name: "Returned",
+      }
+    ]
   },
   {
     path: "*",
@@ -55,10 +65,34 @@ const router = new VueRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  let requiresAuth = to.matched.some(record => record.meta.requiresAuth);
-  let currentUser = firebase.auth().currentUser;
+  const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
+  const currentUser = firebase.auth().currentUser;
+
   //check for requiredAuth guard
   if (requiresAuth) {
+    //access the renting_list DB
+    db.collection("renting_list")
+      .where("user_email", "==", currentUser.email)
+      .get()
+      .then(querySnapshot => {
+        querySnapshot.forEach(doc => {
+          //if user email is in the renting_list (user ist renting a bike) jump to the Renting page
+          if (doc) {
+            next({
+              path: "/dashboard/rent"
+            });
+            // if not jump to /dashboard
+          } else {
+            next({
+              path: "/dashboard",
+              query: { redirect: to.fullPath }
+            });
+          }
+        });
+      })
+      .catch(function(error) {
+        console.log("Error getting renting_list: ", error);
+      });
     //check if NOT LOGGED IN, redirect to the homepage
     if (!currentUser) {
       next({
@@ -69,7 +103,7 @@ router.beforeEach((to, from, next) => {
       next();
     }
   } else {
-    next(); // next() を常に呼び出すようにしてください!
+    next();
   }
 });
 

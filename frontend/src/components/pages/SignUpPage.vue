@@ -18,7 +18,7 @@
       />
       <SubmitButtons>Sign up</SubmitButtons>
     </b-form>
-    link to<router-link to="/home"> Sign in</router-link>
+    link to<router-link to="/"> Sign in</router-link>
   </div>
 </template>
 
