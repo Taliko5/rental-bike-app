@@ -38,22 +38,7 @@ const routes = [
     name: "Dashboard",
     component: Dashboard,
     alias: "/dashboard/renting",
-    meta: {
-      requiresAuth: true
-    }
-  },
-  {
-    path: "/dashboard/rent",
-    name: "Dashboard",
-    component: Dashboard,
-    meta: {
-      requiresAuth: true
-    }
-  },
-  {
-    path: "/dashboard/returned",
-    name: "Dashboard",
-    component: Dashboard,
+    alias: "/dashboard/returned",
     meta: {
       requiresAuth: true
     }

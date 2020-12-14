@@ -18,26 +18,25 @@
       <cluster>
         <gmap-custom-marker :key="index" v-for="(m, index) in markers" :marker="m.location">
           <!-- if the bike is rented by another user change maker color -->
+          <!-- avaiable bike -->
           <img
             v-if="!m.renting"
             class="img"
             src="@/assets/img/icons/marker_red.svg"
             @click="toggleInfoWindow(m, index)"
           />
+          <!-- another user uses the bike -->
           <img
-            v-if="userInfo.rentingBike && m.renting && m.id === userInfo.bikeId"
+            v-if="m.renting && m.renitng_user_email !== userInfo.email"
             class="img"
-            src="@/assets/img/icons/marker_white.svg"
+            src="@/assets/img/icons/marker_gray.svg"
             @click="toggleInfoWindow(m, index)"
           />
+          <!-- the bike user using -->
           <img
-            v-if="
-              !userInfo.rentingBike ||
-                (m.renting && m.renitng_user_email !== userInfo.email) ||
-                (m.renting && m.id !== userInfo.bikeId)
-            "
+            v-if="m.renting && m.renitng_user_email === userInfo.email"
             class="img"
-            src="@/assets/img/icons/marker_black.svg"
+            src="@/assets/img/icons/marker_white.svg"
             @click="toggleInfoWindow(m, index)"
           />
         </gmap-custom-marker>
@@ -48,27 +47,30 @@
         @closeclick="infoWinIsOpen = false"
         :options="infoWinOptions"
       >
+        <!-- info findow content-->
+        <!-- another user uses the bike -->
         <div
           class="info-window-style"
-          v-if="bikeIsRenting && userInfo.email !== this.renitng_user_email"
+          v-if="bikeIsRenting && userInfo.email !== renitng_user_email"
         >
           another user renting bike
         </div>
-
-        <div class="info-window-style" v-if="!bikeIsRenting || !userInfo.rentingBike">
-          <div v-html="chosenBikeName"></div>
-          <SaveButtons @click="rentBike">RENT BIKE?</SaveButtons>
-        </div>
+        <!-- while user is renting a bike show anoher bike -->
         <div
           class="info-window-style"
-          v-if="userInfo.rentingBike && userInfo.email !== this.renitng_user_email"
+          v-if="!bikeIsRenting && userInfo.rentingBike && userInfo.email !== renitng_user_email"
         >
           you can not rent another bike before returning the current bike
         </div>
-
+        <!-- avaiable bike -->
+        <div class="info-window-style" v-if="!bikeIsRenting && !userInfo.rentingBike">
+          <div v-html="chosenBikeName"></div>
+          <SaveButtons @click="rentBike">RENT BIKE?</SaveButtons>
+        </div>
+        <!-- while user is renting a bike show anoher bike -->
         <div
           class="info-window-style"
-          v-if="userInfo.rentingBike && userInfo.email === this.renitng_user_email"
+          v-if="bikeIsRenting && userInfo.rentingBike && userInfo.email === renitng_user_email"
         >
           <div v-html="userInfo.bikeName"></div>
           you are now renting this bike
@@ -123,11 +125,14 @@ export default {
     };
   },
   created() {
+    // initialize marker's array
+    this.markers.splice(0);
     //getting bicycle data from firebase
     db.collection("bicycle")
       .get()
       .then(querySnapshot => {
         querySnapshot.forEach(doc => {
+          console.log(doc.data().renitng_user_email);
           const data = {
             id: doc.id,
             bikeName: doc.data().name,
@@ -154,7 +159,9 @@ export default {
               rentingBike: true,
               bikeName: doc.data().bike_name,
               bikeId: doc.data().bicycle_id,
-              startTime: doc.data().start_time
+              startTime: doc.data().start_time,
+              bikeLocationLat: doc.data().lat,
+              bikeLocationLng: doc.data().lng
             };
             this.userInfo = data;
             //if user email is not in the renting_list
@@ -181,11 +188,11 @@ export default {
     // looking for identified id and not renting and change InfoWindowIsOpen to open infowindow
     toggleInfoWindow(clickedMarker, index) {
       this.infoWinPos = clickedMarker.location;
+      this.bikeIsRenting = clickedMarker.renting;
+      this.chosenBikeName = clickedMarker.bikeName;
+      this.renitng_user_email = clickedMarker.renitng_user_email;
       if (this.currentMarkerIdx === index) {
         this.chosenBikeId = clickedMarker.id;
-        this.bikeIsRenting = clickedMarker.renting;
-        this.chosenBikeName = clickedMarker.bikeName;
-        this.renitng_user_email = clickedMarker.renitng_user_email;
         this.infoWinIsOpen = !this.infoWinIsOpen;
       } else {
         this.currentMarkerIdx = index;
@@ -195,16 +202,17 @@ export default {
     //update the bike's rent infos rented:true retuned:false (defaut, renred:flase, returned:true)
     async updateRentedBikeInfo() {
       try {
+        //getting current user
+        const user = await firebase.auth().currentUser;
         const data = db.collection("bicycle").doc(this.chosenBikeId);
         await data
           .update({
-            rented: true,
-            renitng_user_email: this.userInfo.email
+            renitng_user_email: user.email,
+            rented: true
           })
           .then(bike => {
             console.log("update bike's Info:", bike);
-            this.changemarkerInfo();
-            this.$router.go({ path: this.$router.currentRoute.path, force: true });
+            this.$router.go({ path: "/dashboard/renting", force: true });
           });
       } catch (error) {
         console.log("error by ubdationg bike info:", error);
@@ -216,10 +224,12 @@ export default {
         await data
           .update({
             rented: false,
-            renitng_user_email: this.userInfo.email
+            renitng_user_email: ""
           })
           .then(bike => {
             console.log("update bike's Info:", bike);
+            this.initializeUserInfo();
+            this.$router.go({ path: "/dashboard/returned", force: true });
           });
       } catch (error) {
         console.log("error by ubdationg bike info:", error);
@@ -275,23 +285,6 @@ export default {
           console.log("Error delete bilinlist: ", error);
         });
     },
-    //beauce of no backend the page can not reflesh itself. the marker should be update together
-    changemarkerInfo() {
-      this.markers.splice(0);
-      // db.collection("bicycle")
-      //   .get()
-      //   .then(querySnapshot => {
-      //     querySnapshot.forEach(doc => {
-      //       const data = {
-      //         id: doc.id,
-      //         bikeName: doc.data().name,
-      //         location: { lat: doc.data().lat, lng: doc.data().lng },
-      //         renting: doc.data().rented,
-      //         renitng_user_email: doc.data().renitng_user_email
-      //       };
-      //     });
-      //   });
-    },
     async addHistory() {
       try {
         //getting current user, bike, and rentinglist
@@ -305,7 +298,7 @@ export default {
           bike_name: bike.name,
           start_lat: rentingList.lat,
           start_lng: rentingList.lng,
-          start_time: rentingList.start_time,
+          start_time: this.userInfo.startTime,
           end_time: firebase.firestore.FieldValue.serverTimestamp()
         };
         // add a new data to the 'history' in DB
@@ -322,10 +315,8 @@ export default {
     returnBike() {
       this.addHistory();
       this.deleteRentingBikeList();
-      this.initializeUserInfo();
-      this.changemarkerInfo();
+      this.updateReturnedBikeInfo();
       console.log("returned!");
-      this.$router.go({ path: this.$router.currentRoute.path, force: true });
     }
   }
 };
@@ -335,8 +326,3 @@ export default {
   width: 40px;
 }
 </style>
-// { // id: "01", // chosenBikeName: "mike", // location: { lat: 52.516389, lng: 13.3775 }, //
-content: "bundesland hehe", // renting: false // }, // { // id: "02", // chosenBikeName: "Neko", //
-location: { lat: 52.516589, lng: 13.3275 }, // content: "TU hehe", // renting: false // }, // { //
-id: "03", // chosenBikeName: "Inu", // location: { lat: 52.516489, lng: 13.3575 }, // content: "TU
-hehe", // renting: true // }

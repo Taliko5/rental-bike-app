@@ -7,6 +7,10 @@
 </template>
 
 <script>
+import firebase from "firebase";
+import db from "../firebaseInit";
+import "firebase/database";
+import "firebase/storage";
 export default {
   name: "SideMenu",
   methods: {
