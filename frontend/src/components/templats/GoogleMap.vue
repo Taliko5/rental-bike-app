@@ -191,8 +191,8 @@ export default {
       this.bikeIsRenting = clickedMarker.renting;
       this.chosenBikeName = clickedMarker.bikeName;
       this.renitng_user_email = clickedMarker.renitng_user_email;
+      this.chosenBikeId = clickedMarker.id;
       if (this.currentMarkerIdx === index) {
-        this.chosenBikeId = clickedMarker.id;
         this.infoWinIsOpen = !this.infoWinIsOpen;
       } else {
         this.currentMarkerIdx = index;
