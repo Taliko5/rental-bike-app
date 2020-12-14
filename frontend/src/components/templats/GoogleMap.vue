@@ -229,7 +229,7 @@ export default {
           .then(bike => {
             console.log("update bike's Info:", bike);
             this.initializeUserInfo();
-            this.$router.go({ path: "/dashboard/returned", force: true });
+            // this.$router.go({ path: "/dashboard/returned", force: true });
           });
       } catch (error) {
         console.log("error by ubdationg bike info:", error);
@@ -285,25 +285,38 @@ export default {
           console.log("Error delete bilinlist: ", error);
         });
     },
+    //TODO fix history function
     async addHistory() {
       try {
         //getting current user, bike, and rentinglist
-        const user = await firebase.auth().currentUser;
-        const rentingList = db.collection("renting_list").doc(`bicycle_id/${this.userInfo.bikeId}`);
+        const user = firebase.auth().currentUser;
         const bike = db.doc(`id/${this.userInfo.bikeId}`);
-        // creating a data for adding 'history'
-        const data = {
-          user_email: user.email,
-          bicycle_id: bike.id,
-          bike_name: bike.name,
-          start_lat: rentingList.lat,
-          start_lng: rentingList.lng,
-          start_time: this.userInfo.startTime,
-          end_time: firebase.firestore.FieldValue.serverTimestamp()
-        };
-        // add a new data to the 'history' in DB
-        const list = await db.collection("history").add(data);
-        console.log(list, "add a history succsess!");
+        //getting renting_list
+        const rentingList = db
+          .collection("renting_list")
+          .where("bicycle_id", "==", this.userInfo.bikeId)
+          .get()
+          .then(querySnapshot => {
+            querySnapshot.forEach(rentingList => {
+              console.log(rentingList.id, " => ", rentingList.data());
+              // creating a data for adding 'history'
+              const data = {
+                user_email: user.email,
+                bicycle_id: bike.id,
+                bike_name: this.userInfo.bikeName,
+                start_lat: rentingList.lat,
+                start_lng: rentingList.lng,
+                start_time: this.userInfo.startTime,
+                end_time: firebase.firestore.FieldValue.serverTimestamp()
+              };
+              // add a new data to the 'history' in DB
+              const list = db.collection("history").add(data);
+              console.log(list, "add a history succsess!");
+            });
+          })
+          .catch(err => {
+            console.log(err);
+          });
       } catch (error) {
         console.error("Error by adding history: ", error);
       }
@@ -313,7 +326,7 @@ export default {
       this.updateRentedBikeInfo();
     },
     returnBike() {
-      this.addHistory();
+      // this.addHistory();
       this.deleteRentingBikeList();
       this.updateReturnedBikeInfo();
       console.log("returned!");
