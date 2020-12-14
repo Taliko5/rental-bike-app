@@ -72,15 +72,41 @@
       </GmapInfoWindow>
     </GmapMap>
     {{ $route.path }} : whichpath are we
-    <div class="renting-bike-mini-window" v-if="$route.path === '/dashboard/rent'">
-      <b-icon class="close-icon" icon="x" @click="returnToDashboard"></b-icon>
-      you are now renting the bike
-      <div v-html="userInfo.bikeName"></div>
-      <SaveButtons @click="returnBike">RETURN BIKE</SaveButtons>
+
+    <!-- pop up window by renting and returning -->
+    <div
+      class="renting-bike-mini-window"
+      :class="{ isClosed: isActive }"
+      v-if="$route.path === '/dashboard/rent'"
+    >
+      <PopUpWindow>
+        <b-icon
+          slot="card-icon"
+          font-scale="3"
+          class="pop-up-window-close-button"
+          @click="togglePopUpWindow"
+          icon="x"
+        ></b-icon>
+        <div slot="text">
+          you are now renting the bike
+          <div v-html="userInfo.bikeName"></div>
+        </div>
+        <div slot="button">
+          <SaveButtons @click="returnBike">RETURN BIKE</SaveButtons>
+        </div>
+      </PopUpWindow>
     </div>
+
+    <!-- pop-up window after returning the bike -->
     <div class="rerutning-bike-mini-window" v-if="$route.path === '/dashboard/returned'">
-      <b-icon class="close-icon" icon="x" @click="returnToDashboard"></b-icon>
-      you have returned the bike!
+      <PopUpWindow>
+        <div slot="card-icon">
+          <router-link to="/dashboard">
+            <b-icon class="close-icon" font-scale="3" icon="x"></b-icon>
+          </router-link>
+        </div>
+        <div slot="text">you have returned the bike!</div>
+      </PopUpWindow>
     </div>
   </div>
 </template>
@@ -90,22 +116,22 @@ import firebase from "firebase";
 import db from "../firebaseInit";
 import "firebase/database";
 import "firebase/storage";
+import PopUpWindow from "../atoms/PopUpWindow";
 import GmapCustomMarker from "vue2-gmap-custom-marker";
 import SaveButtons from "../atoms/SaveButtons.vue";
-import RentInfoPopUp from "../atoms/RentInfoPopUp";
-import ReturnedPopUp from "../atoms/ReturnedPopUp";
 export default {
   name: "GoogleMap",
   components: {
     SaveButtons,
     GmapCustomMarker,
-    RentInfoPopUp,
-    ReturnedPopUp
+    PopUpWindow
   },
   data() {
     return {
       userInfo: { email: "", rentingBike: false, bikeId: "", startTime: "", bikeName: "" },
       markers: [],
+      // torriger to close the renting-pop-up-window
+      isActive: false,
       //TODO demo marker list. next the center will be user's location point
       center: { lat: 52.516389, lng: 13.3775 },
       gmapMapOptions: {
@@ -190,7 +216,6 @@ export default {
     //if user email is on the renting_list
     //  making user info wwith rentingbike:true,bike ID, email
   },
-
   methods: {
     async logOut() {
       try {
@@ -204,6 +229,9 @@ export default {
     // there is no reload in Vue-router
     reload() {
       this.$router.go({ path: this.$router.currentRoute.path, force: true });
+    },
+    togglePopUpWindow() {
+      this.isActive = !this.isActive;
     },
     // looking for identified id and not renting and change InfoWindowIsOpen to open infowindow
     toggleInfoWindow(clickedMarker, index) {
@@ -232,7 +260,6 @@ export default {
             rented: true
           })
           .then(() => {
-            alert(`you have rented the bicycle`);
             this.$router.replace({ path: "/dashboard/rent" });
             this.reload();
           });
@@ -251,7 +278,6 @@ export default {
           })
           .then(() => {
             this.initializeUserInfo();
-            alert(`you have returned the bicycle`);
             this.$router.replace({ path: "/dashboard/returned" });
             this.reload();
           });
@@ -358,7 +384,5 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-.img {
-  width: 40px;
-}
+@import "../../assets/scss/organisms/google-map.scss";
 </style>

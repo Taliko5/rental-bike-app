@@ -1,0 +1,18 @@
+.img {
+	width: 40px;
+}
+
+.renting-bike-mini-window,
+.rerutning-bike-mini-window {
+	display: block;
+	position: absolute;
+	top: 25%;
+  left: 25%;
+  z-index: 9998;
+  transition: opacity 0.3s ease;
+	box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.8);
+
+	&.isClosed {
+		display: none;
+	}
+}
