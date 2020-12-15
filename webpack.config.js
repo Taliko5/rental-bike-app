@@ -1,6 +1,5 @@
 const path = require("path");
-require("dotenv").config({ path: __dirname + "/.env" });
-
+const Dotenv = require("dotenv-webpack");
 module.exports = {
   chainWebpack(config) {
     config
@@ -24,5 +23,6 @@ module.exports = {
       }
     }
   },
+  plugins: [new Dotenv()],
   assetsDir: "@/assets/"
 };
