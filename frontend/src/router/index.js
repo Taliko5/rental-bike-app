@@ -71,29 +71,6 @@ router.beforeEach((to, from, next) => {
 
   //check for requiredAuth guard
   if (requiresAuth) {
-    //access the renting_list DB
-    db.collection("renting_list")
-      .where("user_email", "==", currentUser.email)
-      .get()
-      .then(querySnapshot => {
-        querySnapshot.forEach(doc => {
-          //if user email is in the renting_list (user ist renting a bike) jump to the Renting page
-          if (doc) {
-            next({
-              path: "/dashboard/rent"
-            });
-            // if not jump to /dashboard
-          } else {
-            next({
-              path: "/dashboard",
-              query: { redirect: to.fullPath }
-            });
-          }
-        });
-      })
-      .catch(function(error) {
-        console.log("Error getting renting_list: ", error);
-      });
     //check if NOT LOGGED IN, redirect to the homepage
     if (!currentUser) {
       next({

@@ -71,17 +71,18 @@ export default {
     async sendDataToDB() {
       try {
         let n = 0;
-        while (n < 50) {
+        while (n < 70) {
           n++;
           const data = {
             lat: this.markers[n].lat,
             lng: this.markers[n].lng,
-            bikeName: this.markers[n].bikeName,
+            bike_namne: this.markers[n].bikeName,
             renitng_user_email: "",
             rented: false
           };
           const list = await db.collection("bicycle").add(data);
         }
+
       } catch (err) {
         console.log("err by sending data to db:", err);
       }

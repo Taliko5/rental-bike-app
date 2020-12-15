@@ -77,7 +77,7 @@
     <div
       class="renting-bike-mini-window"
       :class="{ isClosed: isActive }"
-      v-if="$route.path === '/dashboard/rent'"
+      v-if="userInfo.rentingBike || (userInfo.rentingBike && $route.path === '/dashboard/rent')"
     >
       <PopUpWindow>
         <b-icon
@@ -168,7 +168,7 @@ export default {
         querySnapshot.forEach(doc => {
           const data = {
             id: doc.id,
-            bikeName: doc.data().bikeName,
+            bikeName: doc.data().bike_namne,
             location: { lat: doc.data().lat, lng: doc.data().lng },
             renting: doc.data().rented,
             renitng_user_email: doc.data().renitng_user_email
@@ -196,6 +196,8 @@ export default {
               bikeLocationLng: doc.data().lng
             };
             this.userInfo = data;
+            // change the center to the renting bike marker
+            this.center = { lat: doc.data().lat, lng: doc.data().lng };
             //if user email is not in the renting_list
             // making user info wwith rentingbike:false, user email
           } else if (!doc) {
@@ -227,8 +229,8 @@ export default {
       }
     },
     // there is no reload in Vue-router
-    reload() {
-      this.$router.go({ path: this.$router.currentRoute.path, force: true });
+    reload(pathName) {
+      window.location.reload({ path: pathName });
     },
     togglePopUpWindow() {
       this.isActive = !this.isActive;
@@ -260,8 +262,8 @@ export default {
             rented: true
           })
           .then(() => {
-            this.$router.replace({ path: "/dashboard/rent" });
-            this.reload();
+            const changeRoute = this.$router.replace({ path: "/dashboard/rent" });
+            this.reload("/dashboard/rent");
           });
       } catch (error) {
         console.log("error by ubdationg bike info:", error);
@@ -278,8 +280,8 @@ export default {
           })
           .then(() => {
             this.initializeUserInfo();
+            this.reload("/dashboard/eturned");
             this.$router.replace({ path: "/dashboard/returned" });
-            this.reload();
           });
       } catch (error) {
         console.log("error by ubdationg bike info:", error);
