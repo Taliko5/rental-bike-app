@@ -1,11 +1,11 @@
 import Vue from "vue";
+import router from "./router";
 import { BootstrapVue, BootstrapVueIcons } from "bootstrap-vue";
 import "default-passive-events";
 //google map
 import * as VueGoogleMaps from "vue2-google-maps";
 import MarkerClusterer from "js-marker-clusterer";
 import GmapCluster from "gmap-vue/dist/components/cluster";
-import router from "./router";
 import firebase from "firebase";
 import "./components/firebaseInit";
 import axios from "axios";

@@ -72,8 +72,10 @@
           class="info-window-style"
           v-if="bikeIsRenting && userInfo.rentingBike && userInfo.email === renitng_user_email"
         >
+          name:
           <h5 v-html="userInfo.bikeName"></h5>
           you are now renting this bike
+          {{ nowData }}
           <SaveButtons @click="returnBike">RETURN BIKE</SaveButtons>
         </div>
       </GmapInfoWindow>
@@ -96,6 +98,8 @@
         ></b-icon>
         <div slot="text">
           you are now renting the bike
+          <p></p>
+          name:
           <h5 v-html="userInfo.bikeName"></h5>
         </div>
         <div slot="button">
@@ -113,6 +117,7 @@
           </router-link>
         </div>
         <div slot="text">you have returned the bike!</div>
+        {{ nowData }}
       </PopUpWindow>
     </div>
   </div>
@@ -120,6 +125,7 @@
 
 <script>
 import firebase from "firebase";
+import moment from "moment";
 import db from "../firebaseInit";
 import "firebase/database";
 import "firebase/storage";
@@ -133,6 +139,7 @@ export default {
     GmapCustomMarker,
     PopUpWindow
   },
+
   data() {
     return {
       userInfo: { email: "", rentingBike: false, bikeId: "", startTime: "", bikeName: "" },
@@ -148,6 +155,7 @@ export default {
         fullscreenControl: false,
         disableDefaultUi: false
       },
+      nowData: "",
       infoWinIsOpen: false,
       infoWinPos: {
         lat: 0,
@@ -165,6 +173,7 @@ export default {
       }
     };
   },
+
   created() {
     // initialize marker's array
     this.markers.splice(0);
@@ -227,6 +236,7 @@ export default {
     };
     this.markers.push(centerLocation);
   },
+
   methods: {
     async logOut() {
       try {
@@ -240,6 +250,12 @@ export default {
     // there is no reload in Vue-router
     reload(pathName) {
       window.location.reload({ path: pathName });
+    },
+    //FIXME to get a duration of renting time
+    getDuration() {
+      // let startTime = moment(this.userInfo.startTime).format("DD MMM YYYY hh:mm a");
+      console.log(moment(this.userInfo.startTime).toNow());
+      return (this.nowData = moment(this.userInfo.startTime).toNow());
     },
     togglePopUpWindow() {
       this.isActive = !this.isActive;
@@ -258,7 +274,6 @@ export default {
         this.infoWinIsOpen = true;
       }
     },
-
     //update the bike's rent infos rented:true retuned:false (defaut, renred:flase, returned:true)
     async updateRentedBikeInfo() {
       try {
@@ -278,7 +293,6 @@ export default {
         console.log("error by ubdationg bike info:", error);
       }
     },
-
     async updateReturnedBikeInfo() {
       try {
         const data = db.collection("bicycle").doc(this.userInfo.bikeId);
@@ -289,14 +303,13 @@ export default {
           })
           .then(() => {
             this.initializeUserInfo();
-            this.$router.replace({ path: "/dashboard/returned" });
             this.reload("/dashboard/");
+            this.$router.replace({ path: "/dashboard/returned" });
           });
       } catch (error) {
         console.log("error by ubdationg bike info:", error);
       }
     },
-
     initializeUserInfo() {
       const user = firebase.auth().currentUser;
       const data = {
@@ -308,7 +321,6 @@ export default {
       };
       this.userInfo = data;
     },
-
     async addRentingBikeList() {
       try {
         //getting current user
@@ -330,7 +342,6 @@ export default {
         console.error("Error by adding renting_bike list: ", error);
       }
     },
-
     async deleteRentingBikeList() {
       const user = await firebase.auth().currentUser;
       const RentingList = await db
@@ -346,7 +357,6 @@ export default {
           console.log("Error delete bilinlist: ", error);
         });
     },
-
     async addHistory() {
       try {
         //getting current user, bike, and rentinglist
@@ -359,7 +369,6 @@ export default {
           .get()
           .then(querySnapshot => {
             querySnapshot.forEach(rentingList => {
-              console.log(rentingList.id, " => ", rentingList.data());
               // creating a data for adding 'history'
               const data = {
                 user_email: user.email,
@@ -370,10 +379,8 @@ export default {
                 start_time: this.userInfo.startTime,
                 end_time: firebase.firestore.Timestamp.now()
               };
-              console.log(data);
               // add a new data to the 'history' in DB
               const list = db.collection("history").add(data);
-              console.log(list, "add a history succsess!");
             });
           })
           .catch(err => {
