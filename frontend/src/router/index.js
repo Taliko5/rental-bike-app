@@ -1,14 +1,11 @@
 import Vue from "vue";
 import firebase from "firebase";
-import db from "../components/firebaseInit";
 import "firebase/database";
 import "firebase/storage";
 import VueRouter from "vue-router";
 import ErrorPage from "../components/pages/ErrorPage.vue";
 import HomePage from "../components/pages/HomePage.vue";
 import SignUpPage from "../components/pages/SignUpPage.vue";
-import test from '../components/atoms/generateDatas.vue';
-
 Vue.use(VueRouter);
 
 const routes = [
