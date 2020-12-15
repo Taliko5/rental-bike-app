@@ -13,7 +13,7 @@
           <!-- if the bike is rented by another user change maker color -->
           <!-- avaiable bike -->
           <img
-            v-if="!m.renting"
+            v-if="!m.renting && m.id !== 'user'"
             class="img"
             src="@/assets/img/icons/marker_red.svg"
             @click="toggleInfoWindow(m, index)"
@@ -34,7 +34,11 @@
           />
 
           <!-- user location -->
-          <img v-if="m.id === 'user'" class="img" src="@/assets/img/icons/my_location.svg" />
+          <img
+            v-if="m.id === 'user' && !userInfo.rentingBike && !m.renting"
+            class="img"
+            src="@/assets/img/icons/my_location.svg"
+          />
         </gmap-custom-marker>
       </cluster>
       <GmapInfoWindow
@@ -162,6 +166,23 @@ export default {
     };
   },
   created() {
+    // initialize marker's array
+    this.markers.splice(0);
+    //getting bicycle data from firebase
+    db.collection("bicycle")
+      .get()
+      .then(querySnapshot => {
+        querySnapshot.forEach(doc => {
+          const data = {
+            id: doc.id,
+            bikeName: doc.data().bike_namne,
+            location: { lat: doc.data().lat, lng: doc.data().lng },
+            renting: doc.data().rented,
+            renitng_user_email: doc.data().renitng_user_email
+          };
+          this.markers.push(data);
+        });
+      });
     // getting user and renting_list data
     const user = firebase.auth().currentUser;
     const RentingList = db
@@ -170,9 +191,9 @@ export default {
       .get()
       .then(querySnapshot => {
         querySnapshot.forEach(doc => {
-          if (doc.data()) {
+          if (doc.data().user_email === user.email) {
             const data = {
-              email: doc.data().user_email,
+              email: user.email,
               rentingBike: true,
               bikeName: doc.data().bike_name,
               bikeId: doc.data().bicycle_id,
@@ -191,6 +212,7 @@ export default {
               rentingBike: false
             };
             this.userInfo = data;
+            console.log(this.userInfo);
           } else {
             console.log("no user info");
           }
@@ -199,25 +221,6 @@ export default {
       .catch(function(error) {
         console.log("Error getting renting_list: ", error);
       });
-
-    // initialize marker's array
-    this.markers.splice(0);
-    //getting bicycle data from firebase
-    db.collection("bicycle")
-      .get()
-      .then(querySnapshot => {
-        querySnapshot.forEach(doc => {
-          const data = {
-            id: doc.id,
-            bikeName: doc.data().bike_namne,
-            location: { lat: doc.data().lat, lng: doc.data().lng },
-            renting: doc.data().rented,
-            renitng_user_email: doc.data().renitng_user_email
-          };
-          this.markers.push(data);
-        });
-      });
-
     const centerLocation = {
       id: "user",
       location: this.center
@@ -286,8 +289,8 @@ export default {
           })
           .then(() => {
             this.initializeUserInfo();
-            this.reload("/dashboard/eturned");
             this.$router.replace({ path: "/dashboard/returned" });
+            this.reload("/dashboard/");
           });
       } catch (error) {
         console.log("error by ubdationg bike info:", error);
@@ -319,7 +322,7 @@ export default {
           bike_name: this.chosenBikeName,
           lat: this.infoWinPos.lat,
           lng: this.infoWinPos.lng,
-          start_time: firebase.firestore.FieldValue.serverTimestamp()
+          start_time: firebase.firestore.Timestamp.now()
         };
         // add a new data to the 'renting_list' in DB
         const list = await db.collection("renting_list").add(data);
@@ -344,7 +347,6 @@ export default {
         });
     },
 
-    //TODO fix history function by returning bicycle
     async addHistory() {
       try {
         //getting current user, bike, and rentinglist
@@ -363,11 +365,12 @@ export default {
                 user_email: user.email,
                 bicycle_id: bike.id,
                 bike_name: this.userInfo.bikeName,
-                start_lat: rentingList.lat,
-                start_lng: rentingList.lng,
+                lat: this.userInfo.bikeLocationLat,
+                lng: this.userInfo.bikeLocationLng,
                 start_time: this.userInfo.startTime,
-                end_time: firebase.firestore.FieldValue.serverTimestamp()
+                end_time: firebase.firestore.Timestamp.now()
               };
+              console.log(data);
               // add a new data to the 'history' in DB
               const list = db.collection("history").add(data);
               console.log(list, "add a history succsess!");
@@ -385,6 +388,7 @@ export default {
       this.updateRentedBikeInfo();
     },
     returnBike() {
+      this.addHistory();
       this.deleteRentingBikeList();
       this.updateReturnedBikeInfo();
     }
