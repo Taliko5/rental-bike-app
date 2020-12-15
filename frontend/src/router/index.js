@@ -21,14 +21,6 @@ const routes = [
     }
   },
   {
-    path: "/test",
-    name: "test",
-    component: test,
-    meta: {
-      requiresGest: true
-    }
-  },
-  {
     path: "/signup",
     name: "SignUpPage",
     component: SignUpPage,

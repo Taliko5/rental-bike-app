@@ -57,7 +57,7 @@
         </div>
         <!-- avaiable bike -->
         <div class="info-window-style" v-if="!bikeIsRenting && !userInfo.rentingBike">
-          <div v-html="chosenBikeName"></div>
+          <h5 v-html="chosenBikeName"></h5>
           <SaveButtons @click="rentBike">RENT BIKE?</SaveButtons>
         </div>
         <!-- while user is renting a bike show anoher bike -->
@@ -65,7 +65,7 @@
           class="info-window-style"
           v-if="bikeIsRenting && userInfo.rentingBike && userInfo.email === renitng_user_email"
         >
-          <div v-html="userInfo.bikeName"></div>
+          <h5 v-html="userInfo.bikeName"></h5>
           you are now renting this bike
           <SaveButtons @click="returnBike">RETURN BIKE</SaveButtons>
         </div>
@@ -89,7 +89,7 @@
         ></b-icon>
         <div slot="text">
           you are now renting the bike
-          <div v-html="userInfo.bikeName"></div>
+          <h5 v-html="userInfo.bikeName"></h5>
         </div>
         <div slot="button">
           <SaveButtons @click="returnBike">RETURN BIKE</SaveButtons>
@@ -168,7 +168,7 @@ export default {
         querySnapshot.forEach(doc => {
           const data = {
             id: doc.id,
-            bikeName: doc.data().name,
+            bikeName: doc.data().bikeName,
             location: { lat: doc.data().lat, lng: doc.data().lng },
             renting: doc.data().rented,
             renitng_user_email: doc.data().renitng_user_email

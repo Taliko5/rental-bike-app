@@ -1,5 +1,5 @@
 <template>
-  <div>hihi</div>
+  <div><save-buttons @click="sendDataToDB"> add files to the DB</save-buttons></div>
 </template>
 
 <script>
@@ -8,8 +8,12 @@ import firebase from "firebase";
 import db from "../firebaseInit";
 import "firebase/database";
 import "firebase/storage";
+import SaveButtons from "./SaveButtons";
 export default {
   name: "genarateDates",
+  components: {
+    SaveButtons
+  },
   data() {
     return {
       markers: [],
@@ -49,9 +53,8 @@ export default {
       });
     // api city bike  https://citybik.es/
     axios.get("http://api.citybik.es//v2/networks/nextbike-berlin").then(response => {
-      console.log(response.data.network.stations[0]);
       let lists = response.data.network.stations;
-      for (let i = 0; i < 120; i++) {
+      for (let i = 0; i < 100; i++) {
         const data = {
           lat: lists[i].latitude,
           lng: lists[i].longitude,
@@ -61,7 +64,28 @@ export default {
         };
         this.markers.push(data);
       }
+      console.log(this.markers);
     });
+  },
+  methods: {
+    async sendDataToDB() {
+      try {
+        let n = 0;
+        while (n < 50) {
+          n++;
+          const data = {
+            lat: this.markers[n].lat,
+            lng: this.markers[n].lng,
+            bikeName: this.markers[n].bikeName,
+            renitng_user_email: "",
+            rented: false
+          };
+          const list = await db.collection("bicycle").add(data);
+        }
+      } catch (err) {
+        console.log("err by sending data to db:", err);
+      }
+    }
   }
 };
 </script>
