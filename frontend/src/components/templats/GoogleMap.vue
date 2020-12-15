@@ -5,7 +5,7 @@
       :center="center"
       :zoom="15"
       map-type-id="roadmap"
-      style="width: 50%; height: 60vh"
+      style="width: 80%; height: 80vh"
       :options="gmapMapOptions"
     >
       <cluster>

@@ -7,6 +7,7 @@ import VueRouter from "vue-router";
 import ErrorPage from "../components/pages/ErrorPage.vue";
 import HomePage from "../components/pages/HomePage.vue";
 import SignUpPage from "../components/pages/SignUpPage.vue";
+import test from '../components/atoms/generateDatas.vue';
 
 Vue.use(VueRouter);
 
@@ -15,6 +16,14 @@ const routes = [
     path: "/",
     name: "HomePage",
     component: HomePage,
+    meta: {
+      requiresGest: true
+    }
+  },
+  {
+    path: "/test",
+    name: "test",
+    component: test,
     meta: {
       requiresGest: true
     }
@@ -45,11 +54,11 @@ const routes = [
     children: [
       {
         path: "rent",
-        name: "Rent",
+        name: "Rent"
       },
       {
         path: "returned",
-        name: "Returned",
+        name: "Returned"
       }
     ]
   },
