@@ -32,6 +32,9 @@
             src="@/assets/img/icons/marker_white.svg"
             @click="toggleInfoWindow(m, index)"
           />
+
+          <!-- user location -->
+          <img v-if="m.id === 'user'" class="img" src="@/assets/img/icons/my_location.svg" />
         </gmap-custom-marker>
       </cluster>
       <GmapInfoWindow
@@ -133,7 +136,7 @@ export default {
       // torriger to close the renting-pop-up-window
       isActive: false,
       //TODO demo marker list. next the center will be user's location point
-      center: { lat: 52.516389, lng: 13.3775 },
+      center: { lat: 52.516399, lng: 13.3885 },
       gmapMapOptions: {
         mapTypeControl: false,
         streetViewControl: false,
@@ -159,24 +162,6 @@ export default {
     };
   },
   created() {
-    // initialize marker's array
-    this.markers.splice(0);
-    //getting bicycle data from firebase
-    db.collection("bicycle")
-      .get()
-      .then(querySnapshot => {
-        querySnapshot.forEach(doc => {
-          const data = {
-            id: doc.id,
-            bikeName: doc.data().bike_namne,
-            location: { lat: doc.data().lat, lng: doc.data().lng },
-            renting: doc.data().rented,
-            renitng_user_email: doc.data().renitng_user_email
-          };
-          this.markers.push(data);
-        });
-      });
-
     // getting user and renting_list data
     const user = firebase.auth().currentUser;
     const RentingList = db
@@ -215,8 +200,29 @@ export default {
         console.log("Error getting renting_list: ", error);
       });
 
-    //if user email is on the renting_list
-    //  making user info wwith rentingbike:true,bike ID, email
+    // initialize marker's array
+    this.markers.splice(0);
+    //getting bicycle data from firebase
+    db.collection("bicycle")
+      .get()
+      .then(querySnapshot => {
+        querySnapshot.forEach(doc => {
+          const data = {
+            id: doc.id,
+            bikeName: doc.data().bike_namne,
+            location: { lat: doc.data().lat, lng: doc.data().lng },
+            renting: doc.data().rented,
+            renitng_user_email: doc.data().renitng_user_email
+          };
+          this.markers.push(data);
+        });
+      });
+
+    const centerLocation = {
+      id: "user",
+      location: this.center
+    };
+    this.markers.push(centerLocation);
   },
   methods: {
     async logOut() {

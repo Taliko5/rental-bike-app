@@ -5,11 +5,11 @@ import "default-passive-events";
 import * as VueGoogleMaps from "vue2-google-maps";
 import MarkerClusterer from "js-marker-clusterer";
 import GmapCluster from "gmap-vue/dist/components/cluster";
-import App from "./App.vue";
 import router from "./router";
 import firebase from "firebase";
 import "./components/firebaseInit";
 import axios from "axios";
+import App from "./App.vue";
 
 //bootstrap css
 import "bootstrap/dist/css/bootstrap.css";
