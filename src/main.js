@@ -1,7 +1,6 @@
 import Vue from "vue";
 import router from "./router";
 import { BootstrapVue, BootstrapVueIcons } from "bootstrap-vue";
-import "default-passive-events";
 //google map
 import * as VueGoogleMaps from "vue2-google-maps";
 import MarkerClusterer from "js-marker-clusterer";
@@ -15,7 +14,6 @@ import App from "./App.vue";
 // import "bootstrap-vue/dist/bootstrap-vue.css";
 // import "bootstrap/dist/css/bootstrap.css";
 import "./assets/scss/base/custom.scss";
-
 Vue.use(BootstrapVue);
 Vue.use(BootstrapVueIcons);
 Vue.config.productionTip = false;
