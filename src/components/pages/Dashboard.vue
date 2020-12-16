@@ -1,6 +1,8 @@
 <template>
   <div class="dashboard">
-    <b-icon class="menu-icon" icon="three-dots" font-scale="3" v-b-toggle.sidebar-1></b-icon>
+    <div class="menu-icon">
+      <b-icon icon="three-dots" font-scale="3" v-b-toggle.sidebar-1></b-icon>
+    </div>
     <SideMenu></SideMenu>
     <GoogleMap></GoogleMap>
   </div>
@@ -17,7 +19,7 @@ export default {
   name: "Dashboard",
   components: {
     GoogleMap,
-    SideMenu,
+    SideMenu
   },
   data() {
     return {
@@ -27,3 +29,6 @@ export default {
   }
 };
 </script>
+<style lang="scss">
+@import "../../assets/scss/page/_dashboard";
+</style>

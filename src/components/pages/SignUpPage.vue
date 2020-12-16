@@ -1,24 +1,26 @@
 <template>
-  <div>
-    Sign up
-    <div class="error-message">{{ error }}</div>
-    <b-form id="sign-up" @submit.prevent="signUp">
-      <TextInput
-        :idName="email.id"
-        :inputType="email.inputType"
-        :label="email.label"
-        :value="email.value"
-        @input="email.value = $event"
-      />
-      <TextInput
-        :idName="password.id"
-        :inputType="password.inputType"
-        :label="password.label"
-        v-model="password.value"
-      />
-      <SubmitButtons>Sign up</SubmitButtons>
-    </b-form>
-    link to<router-link to="/"> Sign in</router-link>
+  <div id="sign-up-page">
+    <div class="sign-in-container container col-11 col-md-5">
+      <h3 class="sign-up-header">Sign up</h3>
+      <div class="error-message">{{ error }}</div>
+      <b-form id="sign-up" @submit.prevent="signUp">
+        <TextInput
+          :idName="email.id"
+          :inputType="email.inputType"
+          :label="email.label"
+          :value="email.value"
+          @input="email.value = $event"
+        />
+        <TextInput
+          :idName="password.id"
+          :inputType="password.inputType"
+          :label="password.label"
+          v-model="password.value"
+        />
+        <SubmitButtons>Sign up</SubmitButtons>
+      </b-form>
+      Have an account?<router-link to="/"> Sign in</router-link>
+    </div>
   </div>
 </template>
 
@@ -87,3 +89,6 @@ export default {
   }
 };
 </script>
+<style lang="scss">
+@import "../../assets/scss/page/_home_page";
+</style>

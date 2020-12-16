@@ -1,7 +1,12 @@
 <template>
   <div>
-    <b-sidebar id="sidebar-1" title="Sidebar" shadow>
-      <span class="logout-wrapper" @click="logOut">log out</span>
+    <b-sidebar id="sidebar-1" shadow>
+      <div class="sidebar-menu">
+        <p>map</p>
+        <p>history</p>
+        <p>setting</p>
+        <p class="logout-wrapper" @click="logOut">log out</p>
+      </div>
     </b-sidebar>
   </div>
 </template>
@@ -27,3 +32,6 @@ export default {
   }
 };
 </script>
+<style lang="scss" scoped>
+@import "../../assets/scss/components/organisms/_siede_menu";
+</style>

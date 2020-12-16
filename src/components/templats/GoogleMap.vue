@@ -1,11 +1,10 @@
 <template>
   <div class="google-map-wrapper">
-    <div class="logout"><span class="logout-wrapper" @click="logOut">log out</span></div>
     <GmapMap
       :center="center"
       :zoom="15"
       map-type-id="roadmap"
-      style="width: 80%; height: 80vh"
+      style="width: 60vw; height: 90vh"
       :options="gmapMapOptions"
     >
       <cluster>
@@ -64,6 +63,7 @@
         </div>
         <!-- avaiable bike -->
         <div class="info-window-style" v-if="!bikeIsRenting && !userInfo.rentingBike">
+           <b-icon class="bike-icon" variant="success" icon="bicycle" font-scale="5"></b-icon>
           <h5 v-html="chosenBikeName"></h5>
           <SaveButtons @click="rentBike">RENT BIKE?</SaveButtons>
         </div>
@@ -72,16 +72,14 @@
           class="info-window-style"
           v-if="bikeIsRenting && userInfo.rentingBike && userInfo.email === renitng_user_email"
         >
-          name:
+           <b-icon class="bike-icon" variant="success" icon="bicycle" font-scale="5"></b-icon>
           <h5 v-html="userInfo.bikeName"></h5>
           you are now renting this bike
           {{ nowData }}
-          <SaveButtons @click="returnBike">RETURN BIKE</SaveButtons>
+          <SaveButtons :color="outline - success" @click="returnBike">RETURN BIKE</SaveButtons>
         </div>
       </GmapInfoWindow>
     </GmapMap>
-    {{ $route.path }} : whichpath are we
-
     <!-- pop up window by renting and returning -->
     <div
       class="renting-bike-mini-window"
@@ -89,18 +87,21 @@
       v-if="userInfo.rentingBike || (userInfo.rentingBike && $route.path === '/dashboard/rent')"
     >
       <PopUpWindow>
-        <b-icon
-          slot="card-icon"
-          font-scale="3"
-          class="pop-up-window-close-button"
-          @click="togglePopUpWindow"
-          icon="x"
-        ></b-icon>
+        <div slot="card-icon">
+          <b-icon
+            slot="card-icon"
+            font-scale="3"
+            class="pop-up-window-close-button"
+            @click="togglePopUpWindow"
+            icon="x"
+          ></b-icon>
+        </div>
         <div slot="text">
           you are now renting the bike
           <p></p>
-          name:
-          <h5 v-html="userInfo.bikeName"></h5>
+          <b-icon class="bike-icon" variant="success" icon="bicycle" font-scale="5"></b-icon>
+
+          <h4 v-html="userInfo.bikeName"></h4>
         </div>
         <div slot="button">
           <SaveButtons @click="returnBike">RETURN BIKE</SaveButtons>
@@ -403,5 +404,5 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-@import "../../assets/scss/organisms/google-map.scss";
+@import "../../assets/scss/components/organisms/_google-map";
 </style>

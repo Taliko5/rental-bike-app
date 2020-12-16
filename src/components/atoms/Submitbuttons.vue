@@ -23,5 +23,5 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-@import '../../assets/scss/atoms/_submit-buttons';
+@import '../../assets/scss/components/atoms/_submit-buttons';
 </style>

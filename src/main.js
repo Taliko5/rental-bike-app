@@ -11,9 +11,11 @@ import "./components/firebaseInit";
 import axios from "axios";
 import App from "./App.vue";
 
-//bootstrap css
-import "bootstrap/dist/css/bootstrap.css";
-import "bootstrap-vue/dist/bootstrap-vue.css";
+//bootstrap custom css
+// import "bootstrap-vue/dist/bootstrap-vue.css";
+// import "bootstrap/dist/css/bootstrap.css";
+import "./assets/scss/base/custom.scss";
+
 Vue.use(BootstrapVue);
 Vue.use(BootstrapVueIcons);
 Vue.config.productionTip = false;

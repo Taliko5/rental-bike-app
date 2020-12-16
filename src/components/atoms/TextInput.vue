@@ -1,6 +1,6 @@
 <template>
   <div class="text-input">
-    <b-form-group :label="label" :label-for="idName" :description="description">
+    <b-form-group class="input-label" :label="label" :label-for="idName" :description="description">
       <b-form-input
         required
         placeholder=""
@@ -41,3 +41,6 @@ export default {
   }
 };
 </script>
+<style lang="scss">
+@import "../../assets/scss/page/_home_page";
+</style>

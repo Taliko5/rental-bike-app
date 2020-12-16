@@ -13,7 +13,7 @@ export default {
     color: {
       type: String,
       require: false,
-      default: "primary"
+      default: "outline-success"
     }
   },
   methods: {
@@ -23,3 +23,6 @@ export default {
   }
 };
 </script>
+<style lang="scss" scoped>
+@import '../../assets/scss/components/atoms/_save-buttons';
+</style>

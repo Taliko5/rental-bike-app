@@ -1,2 +1,9 @@
-@import './atoms/save-buttons.scss';
-@import './organisms/google-map.scss';
+@import './base/custom.scss';
+@import './base/base.scss';
+@import './page/home_page';
+@import './page/_dashboard';
+@import './components/organisms/google-map';
+@import './components/atoms/save-buttons';
+@import './components/atoms/text_input';
+@import './components/atoms/submit-buttons';
+@import './components/atoms/pop_up_window';
