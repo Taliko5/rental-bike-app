@@ -2,9 +2,8 @@
   <div>
     <b-sidebar id="sidebar-1" shadow>
       <div class="sidebar-menu">
-        <p>map</p>
-        <p>history</p>
-        <p>setting</p>
+        <p>history(coming soon...)</p>
+        <p>setting(coming soon..)</p>
         <p class="logout-wrapper" @click="logOut">log out</p>
       </div>
     </b-sidebar>

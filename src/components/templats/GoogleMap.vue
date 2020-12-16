@@ -4,7 +4,7 @@
       :center="center"
       :zoom="15"
       map-type-id="roadmap"
-      style="width: 60vw; height: 90vh"
+      style="width: 100vw; height: 100vh"
       :options="gmapMapOptions"
     >
       <cluster>
@@ -63,7 +63,7 @@
         </div>
         <!-- avaiable bike -->
         <div class="info-window-style" v-if="!bikeIsRenting && !userInfo.rentingBike">
-           <b-icon class="bike-icon" variant="success" icon="bicycle" font-scale="5"></b-icon>
+          <b-icon class="bike-icon" variant="success" icon="bicycle" font-scale="5"></b-icon>
           <h5 v-html="chosenBikeName"></h5>
           <SaveButtons @click="rentBike">RENT BIKE?</SaveButtons>
         </div>
@@ -72,7 +72,7 @@
           class="info-window-style"
           v-if="bikeIsRenting && userInfo.rentingBike && userInfo.email === renitng_user_email"
         >
-           <b-icon class="bike-icon" variant="success" icon="bicycle" font-scale="5"></b-icon>
+          <b-icon class="bike-icon" variant="success" icon="bicycle" font-scale="5"></b-icon>
           <h5 v-html="userInfo.bikeName"></h5>
           you are now renting this bike
           {{ nowData }}
@@ -287,8 +287,8 @@ export default {
             rented: true
           })
           .then(() => {
+            this.reload("/dashboard");
             const changeRoute = this.$router.replace({ path: "/dashboard/rent" });
-            this.reload("/dashboard/rent");
           });
       } catch (error) {
         console.log("error by ubdationg bike info:", error);
@@ -304,7 +304,7 @@ export default {
           })
           .then(() => {
             this.initializeUserInfo();
-            this.reload("/dashboard/");
+            this.reload("/dashboard");
             this.$router.replace({ path: "/dashboard/returned" });
           });
       } catch (error) {

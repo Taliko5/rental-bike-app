@@ -70,8 +70,8 @@ export default {
   methods: {
     async sendDataToDB() {
       try {
-        let n = 0;
-        while (n < 70) {
+        let n = 71;
+        while (n < 60) {
           n++;
           const data = {
             lat: this.markers[n].lat,
