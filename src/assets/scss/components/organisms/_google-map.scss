@@ -1,0 +1,31 @@
+@import '../../base/custom.scss';
+
+.img {
+	width: 40px;
+}
+
+.btn-primary {
+	color: #fff;
+	background-color: $green;
+	border-color: $green;
+}
+
+.info-window-style {
+	text-align: center;
+}
+.renting-bike-mini-window,
+.rerutning-bike-mini-window {
+	display: block;
+	position: absolute;
+	width: 300px;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	z-index: 9998;
+	transition: opacity 0.3s ease;
+	box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.8);
+
+	&.isClosed {
+		display: none;
+	}
+}

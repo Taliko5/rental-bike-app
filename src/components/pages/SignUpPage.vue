@@ -25,6 +25,8 @@
 </template>
 
 <script>
+import "firebase/database";
+import "firebase/storage";
 import firebase from "firebase";
 import moduleName from "firebase/auth";
 import SubmitButtons from "../atoms/Submitbuttons";

@@ -70,8 +70,8 @@ export default {
   methods: {
     async sendDataToDB() {
       try {
-        let n = 71;
-        while (n < 60) {
+        let n = 0;
+        while (n < 75) {
           n++;
           const data = {
             lat: this.markers[n].lat,
@@ -81,6 +81,7 @@ export default {
             rented: false
           };
           const list = await db.collection("bicycle").add(data);
+          console.log('done');
         }
 
       } catch (err) {

@@ -1,0 +1,37 @@
+@import '../base/custom.scss';
+
+#home-page,
+#sign-up-page {
+	background-image: url('/bgimg.jpeg');
+	background-size: cover;
+	height: 100vh;
+	padding: 1rem;
+	display: flex;
+	align-items: center;
+	color: $dark;
+
+	.logo-wrapper {
+		width: 150px;
+		margin: 0 auto;
+	}
+
+	.error-message{
+		color: #ff4733;
+	}
+
+	h1 {
+		text-align: center;
+		font-weight: 700;
+	}
+	h3 {
+		font-weight: 700;
+		&.sign-up-header {
+			color: $green;
+		}
+	}
+
+	a {
+		color: $green;
+		font-weight: 700;
+	}
+}

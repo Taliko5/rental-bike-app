@@ -1,0 +1,8 @@
+@import '../../base/custom.scss';
+.text-input {
+	.form-group {
+		label.d-block.input-label {
+			color: $green;
+		}
+	}
+}

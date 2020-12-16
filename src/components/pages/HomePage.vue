@@ -32,6 +32,8 @@
 </template>
 
 <script>
+import "firebase/database";
+import "firebase/storage";
 import firebase from "firebase";
 import SubmitButtons from "../atoms/Submitbuttons";
 import TextInput from "../atoms/TextInput";

@@ -10,9 +10,6 @@
 
 <script>
 import firebase from "firebase";
-import "firebase/database";
-import "firebase/storage";
-
 import GoogleMap from "../templats/GoogleMap";
 import SideMenu from "../organisms/SideMenu";
 export default {

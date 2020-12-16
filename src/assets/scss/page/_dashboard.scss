@@ -1,0 +1,9 @@
+@import '../base/custom.scss';
+.dashboard {
+  position: relative;
+  .menu-icon{
+    position: absolute;
+    top :20px;
+    z-index: 99999;
+  }
+}

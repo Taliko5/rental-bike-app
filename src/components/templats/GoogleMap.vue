@@ -1,5 +1,6 @@
 <template>
   <div class="google-map-wrapper">
+    <!-- googlemap -->
     <GmapMap
       :center="center"
       :zoom="15"
@@ -40,6 +41,7 @@
           />
         </gmap-custom-marker>
       </cluster>
+      <!-- google map info window -->
       <GmapInfoWindow
         :position="infoWinPos"
         :opened="infoWinIsOpen"
@@ -100,7 +102,7 @@
           you are now renting the bike
           <p></p>
           <b-icon class="bike-icon" variant="success" icon="bicycle" font-scale="5"></b-icon>
-
+          <!-- here will come {{ rentingDuration}} to show the duration-->
           <h4 v-html="userInfo.bikeName"></h4>
         </div>
         <div slot="button">
@@ -118,7 +120,7 @@
           </router-link>
         </div>
         <div slot="text">you have returned the bike!</div>
-        {{ nowData }}
+        <!-- here will come {{ rentingDuration}} to show the duration-->
       </PopUpWindow>
     </div>
   </div>
@@ -148,15 +150,16 @@ export default {
       // torriger to close the renting-pop-up-window
       isActive: false,
       //TODO demo marker list. next the center will be user's location point
-      center: { lat: 52.516399, lng: 13.3885 },
+      center: { lat: 52.5298, lng: 13.40145 },
       gmapMapOptions: {
         mapTypeControl: false,
         streetViewControl: false,
         rotateControl: false,
         fullscreenControl: false,
-        disableDefaultUi: false
+        disableDefaultUi: false,
+        clickableIcons: false
       },
-      nowData: "",
+      rentingDuration: "",
       infoWinIsOpen: false,
       infoWinPos: {
         lat: 0,
@@ -256,7 +259,7 @@ export default {
     getDuration() {
       // let startTime = moment(this.userInfo.startTime).format("DD MMM YYYY hh:mm a");
       console.log(moment(this.userInfo.startTime).toNow());
-      return (this.nowData = moment(this.userInfo.startTime).toNow());
+      return (this.rentingDuration = moment(this.userInfo.startTime).toNow());
     },
     togglePopUpWindow() {
       this.isActive = !this.isActive;
@@ -294,6 +297,7 @@ export default {
         console.log("error by ubdationg bike info:", error);
       }
     },
+    // after returning the bike email will be removed and rented will be false in DB.
     async updateReturnedBikeInfo() {
       try {
         const data = db.collection("bicycle").doc(this.userInfo.bikeId);
@@ -311,6 +315,7 @@ export default {
         console.log("error by ubdationg bike info:", error);
       }
     },
+    // after returning bike all bike info of userinfo will be removed (initialized)
     initializeUserInfo() {
       const user = firebase.auth().currentUser;
       const data = {
@@ -358,6 +363,7 @@ export default {
           console.log("Error delete bilinlist: ", error);
         });
     },
+    // to get rent duration and create history page keep the rent-return data.
     async addHistory() {
       try {
         //getting current user, bike, and rentinglist

@@ -1,0 +1,11 @@
+// Bootstrap and its default variables
+@import '../../../../node_modules/bootstrap/';
+// BootstrapVue and its default variables
+@import '../../../../node_modules/bootstrap-vue/src/index.scss';
+
+$dark: #35424a !default;
+$lightgray: #989eb1 !default;
+$green: #2eaa5e !default;
+$green-gradient: linear-gradient(to top, #2fa75d 0%, #2eaa5e 50%, #3cba92 100%);
+$primary: $green-gradient;
+
